@@ -27,5 +27,4 @@ def test_init_teams(team_obj):
     assert team_obj.teams_games == pred_games
 
 
-def test_init_teams(team_obj):
-    obs = ["a", "b", "c"]
+def test_

@@ -17,15 +17,15 @@ class Teams:
     def init_teams(self, teams: list):
         for team in teams:
             if team not in self.teams_elo:
-                self.teams_elo[team] = 1500
+                self.teams_elo[team] = [1500]
                 self.teams_games[team] = 0
 
     def adjust(self, name, score):
-        self.teams_elo[name] = score
+        self.teams_elo[name].append(score)
         self.teams_games[name] += 1
 
     def get_score(self, name):
-        return self.teams_elo[name]
+        return self.teams_elo[name][-1]
 
     def get_games(self, name):
         return self.teams_games[name]
@@ -47,10 +47,7 @@ class ELOMaker:
             self.teams.init_teams(teams)
             csv_df = self.assign_rating(csv_df)
 
-        sorted_teams = sorted(self.teams.get_teams_elo().items(), key=(lambda x: x[1]))
-        for team, score in sorted_teams:
-            print(team, score, self.teams.get_games(team))
-        print(len(sorted_teams))
+        return self.teams
 
     def assign_rating(self, dataframe: pd.DataFrame):
         winner_rating = list()
@@ -70,7 +67,7 @@ class ELOMaker:
 
         return dataframe
 
-    def adjusted_rating(self, winner, loser, k=16):
+    def adjusted_rating(self, winner, loser, k=32):
         elo_win, elo_lose = self.teams.get_score(winner), self.teams.get_score(loser)
         expected_wins = 1 / (1 + 10 ** ((elo_win - elo_lose) / 400))
         expected_lose = 1 / (1 + 10 ** ((elo_lose - elo_win) / 400))
